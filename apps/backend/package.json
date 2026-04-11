@@ -9,12 +9,16 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "@gradewise/db": "*",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.0.0",
-    "@gradewise/db": "*"
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0"

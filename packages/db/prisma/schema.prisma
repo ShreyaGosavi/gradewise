@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -13,9 +8,86 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
+  password  String
+  name      String
   createdAt DateTime @default(now())
+}
+
+model Teacher {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+
+  // a teacher may be class teacher of one class
+  classTeacherOf    Class?              @relation("ClassTeacher")
+
+  // a teacher can teach many subject-class combos
+  subjectAssignments SubjectAssignment[]
+}
+
+model Student {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  // a student belongs to one class
+  studentClass StudentClass?
+}
+
+model Class {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique   // TE-A, BE-B etc.
+  createdAt DateTime @default(now())
+
+  // one class has one class teacher (optional)
+  classTeacherId Int?     @unique
+  classTeacher   Teacher? @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+
+  // subjects taught in this class
+  subjectAssignments SubjectAssignment[]
+
+  // students in this class
+  students StudentClass[]
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique   // DBMS, Networks etc.
+  createdAt DateTime @default(now())
+
+  // which classes this subject is taught in, by whom
+  subjectAssignments SubjectAssignment[]
+}
+
+// Junction table: Teacher teaches Subject in Class
+model SubjectAssignment {
+  id        Int     @id @default(autoincrement())
+
+  teacherId Int
+  subjectId Int
+  classId   Int
+
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  class     Class   @relation(fields: [classId], references: [id])
+
+  // same subject in same class can only have one teacher
+  @@unique([subjectId, classId])
+}
+
+// Junction table: Student assigned to Class
+model StudentClass {
+  id        Int     @id @default(autoincrement())
+
+  studentId Int     @unique    // student can only be in one class
+  classId   Int
+
+  student   Student @relation(fields: [studentId], references: [id])
+  class     Class   @relation(fields: [classId], references: [id])
 }
