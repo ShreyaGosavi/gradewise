@@ -8,6 +8,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Year {
+  FE
+  SE
+  TE
+  BE
+}
+
+enum Department {
+  CSE
+  IT
+  ME
+  CIVIL
+  EXTC
+}
+
 model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -23,49 +38,48 @@ model Teacher {
   name      String
   createdAt DateTime @default(now())
 
-  // a teacher may be class teacher of one class
-  classTeacherOf    Class?              @relation("ClassTeacher")
-
-  // a teacher can teach many subject-class combos
+  classTeacherOf     Class?              @relation("ClassTeacher")
   subjectAssignments SubjectAssignment[]
 }
 
 model Student {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String
-  createdAt DateTime @default(now())
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  name         String
+  year         Year
+  department   Department
+  createdAt    DateTime   @default(now())
 
-  // a student belongs to one class
   studentClass StudentClass?
 }
 
 model Class {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique   // TE-A, BE-B etc.
-  createdAt DateTime @default(now())
+  id         Int        @id @default(autoincrement())
+  year       Year
+  department Department
+  division   String     // A, B, C
 
-  // one class has one class teacher (optional)
-  classTeacherId Int?     @unique
+  createdAt  DateTime   @default(now())
+
+  // one class → one class teacher (optional)
+  classTeacherId Int?    @unique
   classTeacher   Teacher? @relation("ClassTeacher", fields: [classTeacherId], references: [id])
 
-  // subjects taught in this class
   subjectAssignments SubjectAssignment[]
+  students           StudentClass[]
 
-  // students in this class
-  students StudentClass[]
+  // same year + dept + division can't be duplicated
+  @@unique([year, department, division])
 }
 
 model Subject {
   id        Int      @id @default(autoincrement())
-  name      String   @unique   // DBMS, Networks etc.
+  name      String   @unique
   createdAt DateTime @default(now())
 
-  // which classes this subject is taught in, by whom
   subjectAssignments SubjectAssignment[]
 }
 
-// Junction table: Teacher teaches Subject in Class
 model SubjectAssignment {
   id        Int     @id @default(autoincrement())
 
@@ -77,15 +91,14 @@ model SubjectAssignment {
   subject   Subject @relation(fields: [subjectId], references: [id])
   class     Class   @relation(fields: [classId], references: [id])
 
-  // same subject in same class can only have one teacher
+  // one subject in one class = one teacher only
   @@unique([subjectId, classId])
 }
 
-// Junction table: Student assigned to Class
 model StudentClass {
   id        Int     @id @default(autoincrement())
 
-  studentId Int     @unique    // student can only be in one class
+  studentId Int     @unique
   classId   Int
 
   student   Student @relation(fields: [studentId], references: [id])
