@@ -8,6 +8,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── Enums ───────────────────────────────────────────────
+
 enum Year {
   FE
   SE
@@ -22,6 +24,24 @@ enum Department {
   CIVIL
   EXTC
 }
+
+enum MarksType {
+  INSEM1
+  INSEM2
+  ENDSEM
+  INTERNAL
+  PRACTICAL
+  ORAL
+}
+
+enum NoticeType {
+  ASSIGNMENT
+  TEST
+  NOTICE
+  EVENT
+}
+
+// ─── Models ──────────────────────────────────────────────
 
 model Admin {
   id        Int      @id @default(autoincrement())
@@ -40,35 +60,39 @@ model Teacher {
 
   classTeacherOf     Class?              @relation("ClassTeacher")
   subjectAssignments SubjectAssignment[]
+  attendances        Attendance[]
+  notices            NoticeBoard[]
 }
 
 model Student {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
-  name         String
-  year         Year
-  department   Department
-  createdAt    DateTime   @default(now())
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  name       String
+  year       Year
+  department Department
+  createdAt  DateTime   @default(now())
 
-  studentClass StudentClass?
+  studentClass      StudentClass?
+  attendanceRecords AttendanceRecord[]
+  marks             Marks[]
 }
 
 model Class {
   id         Int        @id @default(autoincrement())
   year       Year
   department Department
-  division   String     // A, B, C
-
+  division   String
   createdAt  DateTime   @default(now())
 
-  // one class → one class teacher (optional)
-  classTeacherId Int?    @unique
+  classTeacherId Int?     @unique
   classTeacher   Teacher? @relation("ClassTeacher", fields: [classTeacherId], references: [id])
 
   subjectAssignments SubjectAssignment[]
   students           StudentClass[]
+  attendances        Attendance[]
+  marks              Marks[]
+  notices            NoticeBoard[]
 
-  // same year + dept + division can't be duplicated
   @@unique([year, department, division])
 }
 
@@ -78,29 +102,95 @@ model Subject {
   createdAt DateTime @default(now())
 
   subjectAssignments SubjectAssignment[]
+  attendances        Attendance[]
+  marks              Marks[]
 }
 
 model SubjectAssignment {
-  id        Int     @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
 
   teacherId Int
   subjectId Int
   classId   Int
 
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-  subject   Subject @relation(fields: [subjectId], references: [id])
-  class     Class   @relation(fields: [classId], references: [id])
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+  class   Class   @relation(fields: [classId], references: [id])
 
-  // one subject in one class = one teacher only
   @@unique([subjectId, classId])
 }
 
 model StudentClass {
-  id        Int     @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
 
-  studentId Int     @unique
+  studentId Int @unique
   classId   Int
 
-  student   Student @relation(fields: [studentId], references: [id])
-  class     Class   @relation(fields: [classId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+  class   Class   @relation(fields: [classId], references: [id])
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  lectureNo Int
+
+  classId   Int
+  subjectId Int
+  teacherId Int
+
+  class   Class   @relation(fields: [classId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+
+  records   AttendanceRecord[]
+  createdAt DateTime @default(now())
+
+  @@unique([classId, subjectId, date, lectureNo])
+}
+
+model AttendanceRecord {
+  id           Int     @id @default(autoincrement())
+  attendanceId Int
+  studentId    Int
+  isPresent    Boolean @default(false)
+
+  attendance Attendance @relation(fields: [attendanceId], references: [id])
+  student    Student    @relation(fields: [studentId], references: [id])
+
+  @@unique([attendanceId, studentId])
+}
+
+model Marks {
+  id        Int       @id @default(autoincrement())
+  studentId Int
+  subjectId Int
+  classId   Int
+  type      MarksType
+  obtained  Float
+  total     Float
+
+  student Student @relation(fields: [studentId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+  class   Class   @relation(fields: [classId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, subjectId, type])
+}
+
+model NoticeBoard {
+  id        Int        @id @default(autoincrement())
+  title     String
+  content   String
+  type      NoticeType
+  dueDate   DateTime?
+
+  classId   Int
+  teacherId Int
+
+  class   Class   @relation(fields: [classId], references: [id])
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+
+  createdAt DateTime @default(now())
 }
