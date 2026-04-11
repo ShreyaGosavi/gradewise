@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import { prisma } from "@gradewise/db";
+import { errorHandler } from "./shared/middleware/error.middleware";
+import adminRoutes from "./modules/admin/routes/index";
 
 dotenv.config();
 
@@ -9,15 +10,12 @@ const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.json({ message: "Gradewise backend is running 🎓" });
-});
+app.use("/api/admin", adminRoutes);
+// future: app.use("/api/teacher", teacherRoutes);
+// future: app.use("/api/student", studentRoutes);
 
-app.get("/health", async (req, res) => {
-    const users = await prisma.user.findMany();
-    res.json({ status: "ok", users });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
