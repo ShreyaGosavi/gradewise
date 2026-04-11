@@ -1,5 +1,8 @@
 import { prisma } from "@gradewise/db";
 import { Department, Year } from "@gradewise/db";
+import * as bcrypt from "bcryptjs";
+import { generatePassword } from "../../../shared/utils/passwordGen";
+import { sendStudentWelcomeEmail } from "../../../shared/utils/mailer";
 
 // Add student
 export const addStudent = async (
@@ -11,11 +14,23 @@ export const addStudent = async (
     const existing = await prisma.student.findUnique({ where: { email } });
     if (existing) throw new Error("Student with this email already exists");
 
+    const rawPassword = generatePassword(name);
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
     const student = await prisma.student.create({
-        data: { name, email, year, department },
+        data: { name, email, password: hashedPassword, year, department },
     });
 
-    return student;
+    await sendStudentWelcomeEmail(email, name, rawPassword);
+
+    return {
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        year: student.year,
+        department: student.department,
+        createdAt: student.createdAt,
+    };
 };
 
 // Get all students with filters
