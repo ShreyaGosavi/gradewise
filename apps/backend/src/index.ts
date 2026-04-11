@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import { prisma } from "@gradewise/db";
 
 dotenv.config();
 
@@ -9,11 +10,12 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.json({ message: "Gradewise backend is running" });
+    res.json({ message: "Gradewise backend is running 🎓" });
 });
 
-app.get("/health", (req, res) => {
-    res.json({ status: "ok" });
+app.get("/health", async (req, res) => {
+    const users = await prisma.user.findMany();
+    res.json({ status: "ok", users });
 });
 
 app.listen(PORT, () => {
