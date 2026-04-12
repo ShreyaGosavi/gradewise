@@ -18,7 +18,9 @@ export const createTeacher = async (req: AuthRequest, res: Response) => {
         const teacher = await addTeacher(name, email);
         return successResponse(res, teacher, "Teacher added successfully", 201);
     } catch (err: any) {
-        return errorResponse(res, err.message);
+        // handle known errors with 400, unknown with 500
+        const status = err.message.includes("already exists") ? 400 : 500;
+        return errorResponse(res, err.message, status);
     }
 };
 

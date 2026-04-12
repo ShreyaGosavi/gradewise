@@ -18,8 +18,12 @@ export const addTeacher = async (name: string, email: string) => {
         data: { name, email, password: hashedPassword },
     });
 
-    // send welcome email with raw password
-    await sendTeacherWelcomeEmail(email, name, rawPassword);
+    // send welcome email — don't fail if email fails
+    try {
+        await sendTeacherWelcomeEmail(email, name, rawPassword);
+    } catch (emailErr) {
+        console.error("❌ Email failed:", emailErr);
+    }
 
     return {
         id: teacher.id,

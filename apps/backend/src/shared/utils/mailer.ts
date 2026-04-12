@@ -1,21 +1,20 @@
-import sgMail from "@sendgrid/mail";
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+import { Resend } from "resend";
 
 export const sendTeacherWelcomeEmail = async (
     to: string,
     name: string,
     password: string
 ) => {
-    const msg = {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+        from: process.env.FROM_EMAIL as string,
         to,
-        from: process.env.SENDGRID_FROM_EMAIL as string,
         subject: "Welcome to Gradewise 🎓",
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
         <h2>Welcome to Gradewise, ${name}!</h2>
         <p>Your account has been created by the admin.</p>
-        <p>Here are your login credentials:</p>
         <div style="background: #f4f4f4; padding: 16px; border-radius: 8px;">
           <p><strong>Email:</strong> ${to}</p>
           <p><strong>Password:</strong> ${password}</p>
@@ -25,9 +24,7 @@ export const sendTeacherWelcomeEmail = async (
         </p>
       </div>
     `,
-    };
-
-    await sgMail.send(msg);
+    });
 };
 
 export const sendStudentWelcomeEmail = async (
@@ -35,9 +32,11 @@ export const sendStudentWelcomeEmail = async (
     name: string,
     password: string
 ) => {
-    const msg = {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+        from: process.env.FROM_EMAIL as string,
         to,
-        from: process.env.SENDGRID_FROM_EMAIL as string,
         subject: "Welcome to Gradewise 🎓",
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
@@ -52,6 +51,5 @@ export const sendStudentWelcomeEmail = async (
         </p>
       </div>
     `,
-    };
-    await sgMail.send(msg);
+    });
 };

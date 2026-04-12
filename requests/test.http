@@ -1,0 +1,281 @@
+### ─── ADMIN AUTH ─────────────────────────────────────
+
+### 1. Admin Login
+POST http://localhost:8000/api/admin/auth/login
+Content-Type: application/json
+
+{
+  "email": "Smita Anit",
+  "password": "shreyagosavi05@gmail.com"
+}
+
+### 2. Admin Get Me
+GET http://localhost:8000/api/admin/auth/me
+Authorization: Bearer {{adminToken}}
+
+### ─── ADMIN TEACHERS ───────────────────────────────────
+
+
+### 3. Add Teacher
+POST http://localhost:8000/api/admin/teachers
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Smita Anit",
+  "email": "shreyagosavi05@gmail.com"
+}
+
+### 4. Get All Teachers
+GET http://localhost:8000/api/admin/teachers
+Authorization: Bearer {{adminToken}}
+
+### 5. Get All Teachers filtered by department
+GET http://localhost:8000/api/admin/teachers?department=CSE
+Authorization: Bearer {{adminToken}}
+
+### 6. Get Teacher by ID
+GET http://localhost:8000/api/admin/teachers/13
+Authorization: Bearer {{adminToken}}
+
+### 7. Delete Teacher
+DELETE http://localhost:8000/api/admin/teachers/10
+Authorization: Bearer {{adminToken}}
+
+### ─── ADMIN STUDENTS ───────────────────────────────────
+
+### 8. Add Student
+POST http://localhost:8000/api/admin/students
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Shreya Gosavi",
+  "email": "shreyagosavi05@gmail.com",
+  "year": "TE",
+  "department": "CSE"
+}
+
+### 9. Get All Students
+GET http://localhost:8000/api/admin/students
+Authorization: Bearer {{adminToken}}
+
+### 10. Get Students filtered
+GET http://localhost:8000/api/admin/students?year=TE&department=CSE
+Authorization: Bearer {{adminToken}}
+
+### 11. Get Student by ID
+GET http://localhost:8000/api/admin/students/1
+Authorization: Bearer {{adminToken}}
+
+### ─── ADMIN CLASSES ────────────────────────────────────
+
+### 12. Create Class
+POST http://localhost:8000/api/admin/classes
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "year": "TE",
+  "department": "CSE",
+  "division": "A"
+}
+
+### 13. Get All Classes
+GET http://localhost:8000/api/admin/classes
+Authorization: Bearer {{adminToken}}
+
+### 14. Get Class by ID
+GET http://localhost:8000/api/admin/classes/1
+Authorization: Bearer {{adminToken}}
+
+### ─── ADMIN SUBJECTS ───────────────────────────────────
+
+### 15. Create Subject
+POST http://localhost:8000/api/admin/subjects
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "DBMS"
+}
+
+### 16. Create Another Subject
+POST http://localhost:8000/api/admin/subjects
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "SE"
+}
+
+### 17. Get All Subjects
+GET http://localhost:8000/api/admin/subjects
+Authorization: Bearer {{adminToken}}
+
+### ─── ADMIN ASSIGNMENTS ─────────────────────────────────
+
+### 18. Assign Class Teacher
+POST http://localhost:8000/api/admin/assignments/class-teacher
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "classId": 1,
+  "teacherId": 8
+}
+
+### 19. Assign Subject Teacher
+POST http://localhost:8000/api/admin/assignments/subject-teacher
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "classId": 1,
+  "subjectId": 3,
+  "teacherId": 13
+}
+
+### 20. Assign Student to Class
+POST http://localhost:8000/api/admin/assignments/student-class
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "studentId": 1,
+  "classId": 1
+}
+
+### ─── TEACHER AUTH ──────────────────────────────────────
+
+### 21. Teacher Login
+POST http://localhost:8000/api/teacher/auth/login
+Content-Type: application/json
+
+{
+  "email": "shreyagosavi05@gmail.com",
+  "password": "mrs@2211"
+}
+
+### 22. Teacher Get Me
+GET http://localhost:8000/api/teacher/auth/me
+Authorization: Bearer {{teacherToken}}
+
+### ─── TEACHER ATTENDANCE ────────────────────────────────
+
+### 23. Mark Attendance
+POST http://localhost:8000/api/teacher/attendance
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "classId": 1,
+  "subjectId": 3,
+  "date": "2024-01-15",
+  "lectureNo": 1,
+  "records": [
+    { "studentId": 1, "isPresent": true }
+  ]
+}
+
+### 24. View Attendance
+GET http://localhost:8000/api/teacher/attendance/1/3
+Authorization: Bearer {{teacherToken}}
+
+### 25. Update Attendance
+PUT http://localhost:8000/api/teacher/attendance/1
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "records": [
+    { "studentId": 1, "isPresent": false }
+  ]
+}
+
+### ─── TEACHER MARKS ─────────────────────────────────────
+
+### 26. Add Marks
+POST http://localhost:8000/api/teacher/marks
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "classId": 1,
+  "subjectId": 3,
+  "type": "INSEM1",
+  "total": 30,
+  "records": [
+    { "studentId": 1, "obtained": 25 }
+  ]
+}
+
+### 27. View Marks
+GET http://localhost:8000/api/teacher/marks/1/3
+Authorization: Bearer {{teacherToken}}
+
+### 28. Update Marks
+PUT http://localhost:8000/api/teacher/marks
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "classId": 1,
+  "subjectId": 3,
+  "type": "INSEM1",
+  "records": [
+    { "studentId": 1, "obtained": 28 }
+  ]
+}
+
+### ─── TEACHER NOTICES ───────────────────────────────────
+
+### 29. Post Notice
+POST http://localhost:8000/api/teacher/notices
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "classId": 1,
+  "title": "SE Assignment 1",
+  "content": "Submit SRS for your respective group project",
+  "type": "ASSIGNMENT",
+  "dueDate": "2024-01-20"
+}
+
+### 30. View Notices
+GET http://localhost:8000/api/teacher/notices/1
+Authorization: Bearer {{teacherToken}}
+
+### 31. Delete Notice
+DELETE http://localhost:8000/api/teacher/notices/1
+Authorization: Bearer {{teacherToken}}
+
+### ─── STUDENT AUTH ──────────────────────────────────────
+
+### 32. Student Login
+POST http://localhost:8000/api/student/auth/login
+Content-Type: application/json
+
+{
+  "email": "shreyagosavi05@gmail.com",
+  "password": "shreya@4757"
+}
+
+### 33. Student Get Me
+GET http://localhost:8000/api/student/auth/me
+Authorization: Bearer {{studentToken}}
+
+### ─── STUDENT VIEWS ─────────────────────────────────────
+
+### 34. View My Attendance
+GET http://localhost:8000/api/student/attendance
+Authorization: Bearer {{studentToken}}
+
+### 35. View My Marks
+GET http://localhost:8000/api/student/marks
+Authorization: Bearer {{studentToken}}
+
+### 36. View My Notices
+GET http://localhost:8000/api/student/notices
+Authorization: Bearer {{studentToken}}
