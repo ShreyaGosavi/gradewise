@@ -25,6 +25,7 @@ export const getAllClasses = async (
     skip: number
 ) => {
     const where = {
+        isActive: true,
         ...(filters.year && { year: filters.year }),
         ...(filters.department && { department: filters.department }),
     };
@@ -65,6 +66,12 @@ export const getAllClasses = async (
 
 // Get single class
 export const getClassById = async (id: number) => {
+    const exists = await prisma.class.findUnique({
+        where: { id },
+        select: { isActive: true },
+    });
+
+    if (!exists || !exists.isActive) throw new Error("Class not found");
     const cls = await prisma.class.findUnique({
         where: { id },
         select: {
@@ -99,6 +106,11 @@ export const getClassById = async (id: number) => {
 export const deleteClass = async (id: number) => {
     const cls = await prisma.class.findUnique({ where: { id } });
     if (!cls) throw new Error("Class not found");
-    await prisma.class.delete({ where: { id } });
+    if (!cls.isActive) throw new Error("Class already deleted");
+
+    await prisma.class.update({
+        where: { id },
+        data: { isActive: false },
+    });
     return { message: "Class deleted successfully" };
 };

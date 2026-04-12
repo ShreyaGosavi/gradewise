@@ -41,6 +41,7 @@ export const getAllTeachers = async (
     skip: number
 ) => {
     const where = {
+        isActive: true,
         subjectAssignments: filters.department
             ? { some: { class: { department: filters.department } } }
             : undefined,
@@ -78,6 +79,15 @@ export const getAllTeachers = async (
 
 // Get single teacher
 export const getTeacherById = async (id: number) => {
+    // check exists and is active first
+    const exists = await prisma.teacher.findUnique({
+        where: { id },
+        select: { isActive: true },
+    });
+
+    if (!exists || !exists.isActive) throw new Error("Teacher not found");
+
+    // then fetch full details
     const teacher = await prisma.teacher.findUnique({
         where: { id },
         select: {
@@ -110,7 +120,6 @@ export const getTeacherById = async (id: number) => {
         },
     });
 
-    if (!teacher) throw new Error("Teacher not found");
     return teacher;
 };
 
@@ -118,7 +127,11 @@ export const getTeacherById = async (id: number) => {
 export const deleteTeacher = async (id: number) => {
     const teacher = await prisma.teacher.findUnique({ where: { id } });
     if (!teacher) throw new Error("Teacher not found");
+    if (!teacher.isActive) throw new Error("Teacher already deleted");
 
-    await prisma.teacher.delete({ where: { id } });
+    await prisma.teacher.update({
+        where: { id },
+        data: { isActive: false },
+    });
     return { message: "Teacher deleted successfully" };
 };

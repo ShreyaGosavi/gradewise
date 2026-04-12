@@ -16,6 +16,7 @@ export const getAllSubjects = async (
 ) => {
     const [subjects, total] = await Promise.all([
         prisma.subject.findMany({
+            where: { isActive: true },
             skip,
             take: limit,
             select: {
@@ -40,6 +41,13 @@ export const getAllSubjects = async (
 };
 
 export const getSubjectById = async (id: number) => {
+    const exists = await prisma.subject.findUnique({
+        where: { id },
+        select: { isActive: true },
+    });
+
+    if (!exists || !exists.isActive) throw new Error("Subject not found");
+
     const subject = await prisma.subject.findUnique({
         where: { id },
         select: {
@@ -65,6 +73,11 @@ export const getSubjectById = async (id: number) => {
 export const deleteSubject = async (id: number) => {
     const subject = await prisma.subject.findUnique({ where: { id } });
     if (!subject) throw new Error("Subject not found");
-    await prisma.subject.delete({ where: { id } });
+    if (!subject.isActive) throw new Error("Subject already deleted");
+
+    await prisma.subject.update({
+        where: { id },
+        data: { isActive: false },
+    });
     return { message: "Subject deleted successfully" };
 };

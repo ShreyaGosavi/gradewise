@@ -41,6 +41,7 @@ export const getAllStudents = async (
     skip: number
 ) => {
     const where = {
+        isActive: true,
         ...(filters.department && { department: filters.department }),
         ...(filters.year && { year: filters.year }),
         ...(filters.classId && { studentClass: { classId: filters.classId } }),
@@ -75,6 +76,14 @@ export const getAllStudents = async (
 
 // Get single student
 export const getStudentById = async (id: number) => {
+
+    const exists = await prisma.student.findUnique({
+        where: { id },
+        select: { isActive: true },
+    });
+
+    if (!exists || !exists.isActive) throw new Error("Student not found");
+
     const student = await prisma.student.findUnique({
         where: { id },
         select: {
@@ -107,7 +116,11 @@ export const getStudentById = async (id: number) => {
 export const deleteStudent = async (id: number) => {
     const student = await prisma.student.findUnique({ where: { id } });
     if (!student) throw new Error("Student not found");
+    if (!student.isActive) throw new Error("Student already deleted");
 
-    await prisma.student.delete({ where: { id } });
+    await prisma.student.update({
+        where: { id },
+        data: { isActive: false },
+    });
     return { message: "Student deleted successfully" };
 };
