@@ -4,6 +4,8 @@ import { errorHandler } from "./shared/middleware/error.middleware";
 import adminRoutes from "./modules/admin/routes/index";
 import teacherRoutes from "./modules/teacher/routes/index";
 import studentRoutes from "./modules/student/routes/index";
+import changePasswordRoutes from "./shared/routes/changePassword.route";
+
 
 
 
@@ -17,6 +19,7 @@ app.use(express.json());
 app.use("/api/admin", adminRoutes);
 app.use("/api/teacher", teacherRoutes);
 app.use("/api/student", studentRoutes);
+app.use("/api/auth", changePasswordRoutes);
 
 app.use(errorHandler);
 

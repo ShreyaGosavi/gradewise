@@ -13,7 +13,7 @@ export const loginAdmin = async (email: string, password: string) => {
 
     // generate token
     const token = jwt.sign(
-        { id: admin.id, email: admin.email },
+        { id: admin.id, email: admin.email, role: "admin" },
         process.env.JWT_SECRET as string,
         { expiresIn: "7d" }
     );

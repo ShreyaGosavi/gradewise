@@ -10,7 +10,7 @@ export const loginTeacher = async (email: string, password: string) => {
     if (!isMatch) throw new Error("Invalid email or password");
 
     const token = jwt.sign(
-        { id: teacher.id, email: teacher.email },
+        { id: teacher.id, email: teacher.email, role: "teacher" },
         process.env.JWT_SECRET as string,
         { expiresIn: "7d" }
     );

@@ -267,6 +267,37 @@ Authorization: Bearer {{teacherToken}}
   "attendanceMarks": 5
 }
 
+
+### Change Password - Admin
+POST http://localhost:8000/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "currentPassword": "admin@gradewise",
+  "newPassword": "newpassword123"
+}
+
+### Change Password - Teacher
+POST http://localhost:8000/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer {{teacherToken}}
+
+{
+  "currentPassword": "mrs@2211",
+  "newPassword": "newpassword123"
+}
+
+### Change Password - Student
+POST http://localhost:8000/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer {{studentToken}}
+
+{
+  "currentPassword": "shreya@1234",
+  "newPassword": "newpassword123"
+}
+
 ### ─── STUDENT AUTH ──────────────────────────────────────
 
 ### 32. Student Login
