@@ -6,7 +6,8 @@ import {
     getTeacherById,
     deleteTeacher,
 } from "../services/teacher.service";
-import { successResponse, errorResponse } from "../../../shared/utils/apiResponse";
+import { getPagination } from "../../../shared/utils/pagination";
+import { successResponse ,paginatedResponse, errorResponse } from "../../../shared/utils/apiResponse";
 import { Department } from "@gradewise/db";
 
 export const createTeacher = async (req: AuthRequest, res: Response) => {
@@ -22,13 +23,21 @@ export const createTeacher = async (req: AuthRequest, res: Response) => {
     }
 };
 
+
+
 export const getTeachers = async (req: AuthRequest, res: Response) => {
     try {
         const { department } = req.query;
-        const teachers = await getAllTeachers({
-            department: department as Department | undefined,
-        });
-        return successResponse(res, teachers, "Teachers fetched");
+        const { page, limit, skip } = getPagination(req.query);
+
+        const { teachers, total } = await getAllTeachers(
+            { department: department as Department | undefined },
+            page,
+            limit,
+            skip
+        );
+
+        return paginatedResponse(res, teachers, total, page, limit, "Teachers fetched");
     } catch (err: any) {
         return errorResponse(res, err.message);
     }

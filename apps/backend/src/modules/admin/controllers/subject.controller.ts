@@ -6,7 +6,8 @@ import {
     getSubjectById,
     deleteSubject,
 } from "../services/subject.service";
-import { successResponse, errorResponse } from "../../../shared/utils/apiResponse";
+import { getPagination } from "../../../shared/utils/pagination";
+import { successResponse, paginatedResponse, errorResponse } from "../../../shared/utils/apiResponse";
 
 export const addSubject = async (req: AuthRequest, res: Response) => {
     try {
@@ -19,10 +20,13 @@ export const addSubject = async (req: AuthRequest, res: Response) => {
     }
 };
 
+
+
 export const getSubjects = async (req: AuthRequest, res: Response) => {
     try {
-        const subjects = await getAllSubjects();
-        return successResponse(res, subjects, "Subjects fetched");
+        const { page, limit, skip } = getPagination(req.query);
+        const { subjects, total } = await getAllSubjects(page, limit, skip);
+        return paginatedResponse(res, subjects, total, page, limit, "Subjects fetched");
     } catch (err: any) {
         return errorResponse(res, err.message);
     }

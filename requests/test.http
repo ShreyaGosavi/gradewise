@@ -338,3 +338,16 @@ Authorization: Bearer {{adminToken}}
   "year": "INVALID",
   "department": "XYZ"
 }
+
+
+### Paginated Teachers
+GET http://localhost:8000/api/admin/teachers?page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### Paginated Students filtered
+GET http://localhost:8000/api/admin/students?page=1&limit=5&year=TE&department=CSE
+Authorization: Bearer {{adminToken}}
+
+### Page 2
+GET http://localhost:8000/api/admin/teachers?page=2&limit=5
+Authorization: Bearer {{adminToken}}

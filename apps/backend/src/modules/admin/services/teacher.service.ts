@@ -34,50 +34,46 @@ export const addTeacher = async (name: string, email: string) => {
 };
 
 // Get all teachers with optional filters
-export const getAllTeachers = async (filters: {
-    department?: Department;
-}) => {
-    const teachers = await prisma.teacher.findMany({
-        where: {
-            subjectAssignments: filters.department
-                ? {
-                    some: {
-                        class: { department: filters.department },
-                    },
-                }
-                : undefined,
-        },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            createdAt: true,
-            classTeacherOf: {
-                select: {
-                    id: true,
-                    year: true,
-                    department: true,
-                    division: true,
+export const getAllTeachers = async (
+    filters: { department?: Department },
+    page: number,
+    limit: number,
+    skip: number
+) => {
+    const where = {
+        subjectAssignments: filters.department
+            ? { some: { class: { department: filters.department } } }
+            : undefined,
+    };
+
+    const [teachers, total] = await Promise.all([
+        prisma.teacher.findMany({
+            where,
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                createdAt: true,
+                classTeacherOf: {
+                    select: { id: true, year: true, department: true, division: true },
                 },
-            },
-            subjectAssignments: {
-                select: {
-                    id: true,
-                    subject: { select: { id: true, name: true } },
-                    class: {
-                        select: {
-                            id: true,
-                            year: true,
-                            department: true,
-                            division: true,
+                subjectAssignments: {
+                    select: {
+                        id: true,
+                        subject: { select: { id: true, name: true } },
+                        class: {
+                            select: { id: true, year: true, department: true, division: true },
                         },
                     },
                 },
             },
-        },
-    });
+        }),
+        prisma.teacher.count({ where }),
+    ]);
 
-    return teachers;
+    return { teachers, total };
 };
 
 // Get single teacher

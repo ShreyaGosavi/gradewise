@@ -6,7 +6,8 @@ import {
     getClassById,
     deleteClass,
 } from "../services/class.service";
-import { successResponse, errorResponse } from "../../../shared/utils/apiResponse";
+import { getPagination } from "../../../shared/utils/pagination";
+import { successResponse, paginatedResponse, errorResponse } from "../../../shared/utils/apiResponse";
 import { Department, Year } from "@gradewise/db";
 
 export const addClass = async (req: AuthRequest, res: Response) => {
@@ -20,14 +21,24 @@ export const addClass = async (req: AuthRequest, res: Response) => {
     }
 };
 
+
+
 export const getClasses = async (req: AuthRequest, res: Response) => {
     try {
         const { year, department } = req.query;
-        const classes = await getAllClasses({
-            year: year as Year | undefined,
-            department: department as Department | undefined,
-        });
-        return successResponse(res, classes, "Classes fetched");
+        const { page, limit, skip } = getPagination(req.query);
+
+        const { classes, total } = await getAllClasses(
+            {
+                year: year as Year | undefined,
+                department: department as Department | undefined,
+            },
+            page,
+            limit,
+            skip
+        );
+
+        return paginatedResponse(res, classes, total, page, limit, "Classes fetched");
     } catch (err: any) {
         return errorResponse(res, err.message);
     }

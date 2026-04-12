@@ -34,42 +34,43 @@ export const addStudent = async (
 };
 
 // Get all students with filters
-export const getAllStudents = async (filters: {
-    department?: Department;
-    year?: Year;
-    classId?: number;
-}) => {
-    const students = await prisma.student.findMany({
-        where: {
-            ...(filters.department && { department: filters.department }),
-            ...(filters.year && { year: filters.year }),
-            ...(filters.classId && {
-                studentClass: { classId: filters.classId },
-            }),
-        },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            year: true,
-            department: true,
-            createdAt: true,
-            studentClass: {
-                select: {
-                    class: {
-                        select: {
-                            id: true,
-                            year: true,
-                            department: true,
-                            division: true,
+export const getAllStudents = async (
+    filters: { department?: Department; year?: Year; classId?: number },
+    page: number,
+    limit: number,
+    skip: number
+) => {
+    const where = {
+        ...(filters.department && { department: filters.department }),
+        ...(filters.year && { year: filters.year }),
+        ...(filters.classId && { studentClass: { classId: filters.classId } }),
+    };
+
+    const [students, total] = await Promise.all([
+        prisma.student.findMany({
+            where,
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                year: true,
+                department: true,
+                createdAt: true,
+                studentClass: {
+                    select: {
+                        class: {
+                            select: { id: true, year: true, department: true, division: true },
                         },
                     },
                 },
             },
-        },
-    });
+        }),
+        prisma.student.count({ where }),
+    ]);
 
-    return students;
+    return { students, total };
 };
 
 // Get single student

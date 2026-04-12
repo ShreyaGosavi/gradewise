@@ -9,23 +9,34 @@ export const createSubject = async (name: string) => {
     });
 };
 
-export const getAllSubjects = async () => {
-    return await prisma.subject.findMany({
-        select: {
-            id: true,
-            name: true,
-            createdAt: true,
-            subjectAssignments: {
-                select: {
-                    id: true,
-                    class: {
-                        select: { id: true, year: true, department: true, division: true },
+export const getAllSubjects = async (
+    page: number,
+    limit: number,
+    skip: number
+) => {
+    const [subjects, total] = await Promise.all([
+        prisma.subject.findMany({
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                subjectAssignments: {
+                    select: {
+                        id: true,
+                        class: {
+                            select: { id: true, year: true, department: true, division: true },
+                        },
+                        teacher: { select: { id: true, name: true } },
                     },
-                    teacher: { select: { id: true, name: true } },
                 },
             },
-        },
-    });
+        }),
+        prisma.subject.count(),
+    ]);
+
+    return { subjects, total };
 };
 
 export const getSubjectById = async (id: number) => {

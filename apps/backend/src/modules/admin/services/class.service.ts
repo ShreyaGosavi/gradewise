@@ -18,38 +18,49 @@ export const createClass = async (
 };
 
 // Get all classes with filters
-export const getAllClasses = async (filters: {
-    year?: Year;
-    department?: Department;
-}) => {
-    return await prisma.class.findMany({
-        where: {
-            ...(filters.year && { year: filters.year }),
-            ...(filters.department && { department: filters.department }),
-        },
-        select: {
-            id: true,
-            year: true,
-            department: true,
-            division: true,
-            createdAt: true,
-            classTeacher: {
-                select: { id: true, name: true, email: true },
-            },
-            subjectAssignments: {
-                select: {
-                    id: true,
-                    subject: { select: { id: true, name: true } },
-                    teacher: { select: { id: true, name: true } },
+export const getAllClasses = async (
+    filters: { year?: Year; department?: Department },
+    page: number,
+    limit: number,
+    skip: number
+) => {
+    const where = {
+        ...(filters.year && { year: filters.year }),
+        ...(filters.department && { department: filters.department }),
+    };
+
+    const [classes, total] = await Promise.all([
+        prisma.class.findMany({
+            where,
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                year: true,
+                department: true,
+                division: true,
+                createdAt: true,
+                classTeacher: {
+                    select: { id: true, name: true, email: true },
+                },
+                subjectAssignments: {
+                    select: {
+                        id: true,
+                        subject: { select: { id: true, name: true } },
+                        teacher: { select: { id: true, name: true } },
+                    },
+                },
+                students: {
+                    select: {
+                        student: { select: { id: true, name: true, email: true } },
+                    },
                 },
             },
-            students: {
-                select: {
-                    student: { select: { id: true, name: true, email: true } },
-                },
-            },
-        },
-    });
+        }),
+        prisma.class.count({ where }),
+    ]);
+
+    return { classes, total };
 };
 
 // Get single class
