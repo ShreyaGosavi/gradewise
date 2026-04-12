@@ -29,16 +29,15 @@ export const getTeacherProfile = async (id: number) => {
             name: true,
             email: true,
             createdAt: true,
-            // class they are class teacher of
             classTeacherOf: {
                 select: {
                     id: true,
                     year: true,
                     department: true,
                     division: true,
+                    students: { select: { id: true } },
                 },
             },
-            // all subject assignments
             subjectAssignments: {
                 select: {
                     id: true,
@@ -57,5 +56,42 @@ export const getTeacherProfile = async (id: number) => {
     });
 
     if (!teacher) throw new Error("Teacher not found");
-    return teacher;
+
+    // unique classes teaching
+    const uniqueClassIds = [
+        ...new Set(teacher.subjectAssignments.map((a) => a.class.id)),
+    ];
+
+    // total students across all classes teaching
+    const studentsInClasses = await prisma.studentClass.count({
+        where: { classId: { in: uniqueClassIds } },
+    });
+
+    // total lectures taken
+    const totalLecturesTaken = await prisma.attendance.count({
+        where: { teacherId: id },
+    });
+
+    return {
+        id: teacher.id,
+        name: teacher.name,
+        email: teacher.email,
+        createdAt: teacher.createdAt,
+        classTeacherOf: teacher.classTeacherOf
+            ? {
+                id: teacher.classTeacherOf.id,
+                year: teacher.classTeacherOf.year,
+                department: teacher.classTeacherOf.department,
+                division: teacher.classTeacherOf.division,
+            }
+            : null,
+        subjectAssignments: teacher.subjectAssignments,
+        stats: {
+            isClassTeacher: !!teacher.classTeacherOf,
+            totalSubjectsTeaching: teacher.subjectAssignments.length,
+            totalClassesTeaching: uniqueClassIds.length,
+            totalStudents: studentsInClasses,
+            totalLecturesTaken,
+        },
+    };
 };

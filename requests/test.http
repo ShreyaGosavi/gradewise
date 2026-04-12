@@ -351,3 +351,7 @@ Authorization: Bearer {{adminToken}}
 ### Page 2
 GET http://localhost:8000/api/admin/teachers?page=2&limit=5
 Authorization: Bearer {{adminToken}}
+
+### Teacher Profile with Stats
+GET http://localhost:8000/api/teacher/auth/me
+Authorization: Bearer {{teacherToken}}
