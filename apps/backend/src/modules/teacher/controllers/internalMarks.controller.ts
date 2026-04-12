@@ -10,12 +10,6 @@ export const calculateInternal = async (
     try {
         const { classId, subjectId, totalInternal, attendanceMarks } = req.body;
 
-        if (!classId || !subjectId || !totalInternal || attendanceMarks === undefined)
-            return errorResponse(
-                res,
-                "classId, subjectId, totalInternal and attendanceMarks are required",
-                400
-            );
 
         if (attendanceMarks >= totalInternal)
             return errorResponse(

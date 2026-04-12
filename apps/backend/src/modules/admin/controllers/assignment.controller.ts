@@ -15,8 +15,7 @@ import { successResponse, errorResponse } from "../../../shared/utils/apiRespons
 export const setClassTeacher = async (req: AuthRequest, res: Response) => {
     try {
         const { classId, teacherId } = req.body;
-        if (!classId || !teacherId)
-            return errorResponse(res, "classId and teacherId are required", 400);
+
 
         const result = await assignClassTeacher(Number(classId), Number(teacherId));
         return successResponse(res, result, "Class teacher assigned successfully");
@@ -40,8 +39,6 @@ export const unsetClassTeacher = async (req: AuthRequest, res: Response) => {
 export const setSubjectTeacher = async (req: AuthRequest, res: Response) => {
     try {
         const { classId, subjectId, teacherId } = req.body;
-        if (!classId || !subjectId || !teacherId)
-            return errorResponse(res, "classId, subjectId and teacherId are required", 400);
 
         const result = await assignSubjectTeacher(
             Number(classId),
@@ -69,8 +66,6 @@ export const unsetSubjectTeacher = async (req: AuthRequest, res: Response) => {
 export const setStudentClass = async (req: AuthRequest, res: Response) => {
     try {
         const { studentId, classId } = req.body;
-        if (!studentId || !classId)
-            return errorResponse(res, "studentId and classId are required", 400);
 
         const result = await assignStudentToClass(Number(studentId), Number(classId));
         return successResponse(res, result, "Student assigned to class successfully");

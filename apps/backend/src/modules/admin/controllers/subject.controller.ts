@@ -11,7 +11,6 @@ import { successResponse, errorResponse } from "../../../shared/utils/apiRespons
 export const addSubject = async (req: AuthRequest, res: Response) => {
     try {
         const { name } = req.body;
-        if (!name) return errorResponse(res, "Subject name is required", 400);
 
         const subject = await createSubject(name);
         return successResponse(res, subject, "Subject created successfully", 201);

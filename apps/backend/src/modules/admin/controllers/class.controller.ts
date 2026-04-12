@@ -12,8 +12,6 @@ import { Department, Year } from "@gradewise/db";
 export const addClass = async (req: AuthRequest, res: Response) => {
     try {
         const { year, department, division } = req.body;
-        if (!year || !department || !division)
-            return errorResponse(res, "Year, department and division are required", 400);
 
         const cls = await createClass(year, department, division);
         return successResponse(res, cls, "Class created successfully", 201);

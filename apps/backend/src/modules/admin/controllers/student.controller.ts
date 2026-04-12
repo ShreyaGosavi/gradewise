@@ -12,8 +12,6 @@ import { Department, Year } from "@gradewise/db";
 export const createStudent = async (req: AuthRequest, res: Response) => {
     try {
         const { name, email, year, department } = req.body;
-        if (!name || !email || !year || !department)
-            return errorResponse(res, "Name, email, year and department are required", 400);
 
         const student = await addStudent(name, email, year, department);
         return successResponse(res, student, "Student added successfully", 201);

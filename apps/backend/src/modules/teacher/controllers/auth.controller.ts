@@ -6,8 +6,7 @@ import { TeacherRequest } from "../../../shared/middleware/teacherAuth.middlewar
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password)
-            return errorResponse(res, "Email and password are required", 400);
+
 
         const data = await loginTeacher(email, password);
         return successResponse(res, data, "Login successful");

@@ -6,8 +6,6 @@ import { AuthRequest } from "../../../shared/middleware/auth.middleware";
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password)
-            return errorResponse(res, "Email and password required", 400);
 
         const data = await loginAdmin(email, password);
         return successResponse(res, data, "Login successful");

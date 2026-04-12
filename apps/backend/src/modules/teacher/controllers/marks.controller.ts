@@ -8,8 +8,6 @@ export const createMarks = async (req: TeacherRequest, res: Response) => {
     try {
         const { classId, subjectId, type, total, records } = req.body;
 
-        if (!classId || !subjectId || !type || !total || !records)
-            return errorResponse(res, "All fields are required", 400);
 
         if (!Array.isArray(records) || records.length === 0)
             return errorResponse(res, "Records must be a non-empty array", 400);
@@ -33,8 +31,6 @@ export const editMarks = async (req: TeacherRequest, res: Response) => {
     try {
         const { classId, subjectId, type, records } = req.body;
 
-        if (!classId || !subjectId || !type || !records)
-            return errorResponse(res, "All fields are required", 400);
 
         if (!Array.isArray(records) || records.length === 0)
             return errorResponse(res, "Records must be a non-empty array", 400);

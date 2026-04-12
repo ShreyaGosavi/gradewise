@@ -326,3 +326,15 @@ Authorization: Bearer {{studentToken}}
 ### 36. View My Notices
 GET http://localhost:8000/api/student/notices
 Authorization: Bearer {{studentToken}}
+
+### Test Zod Validation
+POST http://localhost:8000/api/admin/students
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Test",
+  "email": "notanemail",
+  "year": "INVALID",
+  "department": "XYZ"
+}

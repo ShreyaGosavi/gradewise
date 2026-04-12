@@ -14,8 +14,6 @@ export const markLectureAttendance = async (
     try {
         const { classId, subjectId, date, lectureNo, records } = req.body;
 
-        if (!classId || !subjectId || !date || !lectureNo || !records)
-            return errorResponse(res, "All fields are required", 400);
 
         if (!Array.isArray(records) || records.length === 0)
             return errorResponse(res, "Records must be a non-empty array", 400);

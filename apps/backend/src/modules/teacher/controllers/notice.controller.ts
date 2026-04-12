@@ -12,9 +12,6 @@ export const postNotice = async (req: TeacherRequest, res: Response) => {
     try {
         const { classId, title, content, type, dueDate } = req.body;
 
-        if (!classId || !title || !content || !type)
-            return errorResponse(res, "classId, title, content and type are required", 400);
-
         const result = await createNotice(
             req.teacher!.id,
             Number(classId),

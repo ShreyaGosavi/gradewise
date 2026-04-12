@@ -6,13 +6,14 @@ import {
     removeTeacher,
 } from "../controllers/teacher.controller";
 import { protect } from "../../../shared/middleware/auth.middleware";
+import { validate } from "../../../shared/middleware/validate.middleware";
+import { addTeacherSchema } from "../../../shared/validators/admin.validators";
 
 const router = Router();
 
-// all teacher routes are protected
 router.use(protect);
 
-router.post("/", createTeacher);
+router.post("/", validate(addTeacherSchema), createTeacher);
 router.get("/", getTeachers);
 router.get("/:id", getTeacher);
 router.delete("/:id", removeTeacher);

@@ -10,12 +10,6 @@ export const changePasswordController = async (
     try {
         const { currentPassword, newPassword } = req.body;
 
-        if (!currentPassword || !newPassword)
-            return errorResponse(
-                res,
-                "Current password and new password are required",
-                400
-            );
 
         const result = await changePassword(
             req.user!.id,
