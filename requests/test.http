@@ -251,6 +251,10 @@ Authorization: Bearer {{teacherToken}}
 DELETE http://localhost:8000/api/teacher/notices/1
 Authorization: Bearer {{teacherToken}}
 
+### Attendance Summary
+GET http://localhost:8000/api/teacher/attendance/1/3/summary
+Authorization: Bearer {{teacherToken}}
+
 ### ─── STUDENT AUTH ──────────────────────────────────────
 
 ### 32. Student Login

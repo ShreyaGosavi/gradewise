@@ -149,3 +149,61 @@ export const getAttendance = async (
         },
     });
 };
+
+
+export const getAttendanceSummary = async (
+    teacherId: number,
+    classId: number,
+    subjectId: number
+) => {
+    // check teacher is assigned
+    const assignment = await prisma.subjectAssignment.findUnique({
+        where: { subjectId_classId: { subjectId, classId } },
+    });
+    if (!assignment || assignment.teacherId !== teacherId)
+        throw new Error("You are not assigned to this subject in this class");
+
+    // get all students in this class
+    const studentsInClass = await prisma.studentClass.findMany({
+        where: { classId },
+        select: {
+            student: { select: { id: true, name: true, email: true } },
+        },
+    });
+
+    // get all attendance records for this class+subject
+    const allAttendance = await prisma.attendance.findMany({
+        where: { classId, subjectId },
+        select: {
+            id: true,
+            date: true,
+            lectureNo: true,
+            records: {
+                select: { studentId: true, isPresent: true },
+            },
+        },
+    });
+
+    const totalLectures = allAttendance.length;
+
+    // calculate per student
+    const summary = studentsInClass.map(({ student }) => {
+        const attended = allAttendance.filter((lecture) =>
+            lecture.records.some(
+                (r) => r.studentId === student.id && r.isPresent
+            )
+        ).length;
+
+        const percentage =
+            totalLectures > 0 ? Math.round((attended / totalLectures) * 100) : 0;
+
+        return {
+            student,
+            totalLectures,
+            attended,
+            percentage,
+        };
+    });
+
+    return summary;
+};

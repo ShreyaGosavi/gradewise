@@ -1,12 +1,12 @@
 import { Response } from "express";
 import { TeacherRequest } from "../../../shared/middleware/teacherAuth.middleware";
+import { successResponse, errorResponse } from "../../../shared/utils/apiResponse";
 import {
     markAttendance,
     updateAttendance,
     getAttendance,
+    getAttendanceSummary,
 } from "../services/attendance.service";
-import { successResponse, errorResponse } from "../../../shared/utils/apiResponse";
-
 export const markLectureAttendance = async (
     req: TeacherRequest,
     res: Response
@@ -72,6 +72,24 @@ export const getLectureAttendance = async (
         );
 
         return successResponse(res, result, "Attendance fetched");
+    } catch (err: any) {
+        return errorResponse(res, err.message);
+    }
+};
+
+
+export const getAttendanceSummaryController = async (
+    req: TeacherRequest,
+    res: Response
+) => {
+    try {
+        const { classId, subjectId } = req.params;
+        const result = await getAttendanceSummary(
+            req.teacher!.id,
+            Number(classId),
+            Number(subjectId)
+        );
+        return successResponse(res, result, "Attendance summary fetched");
     } catch (err: any) {
         return errorResponse(res, err.message);
     }
