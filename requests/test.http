@@ -355,3 +355,16 @@ Authorization: Bearer {{adminToken}}
 ### Teacher Profile with Stats
 GET http://localhost:8000/api/teacher/auth/me
 Authorization: Bearer {{teacherToken}}
+
+
+### Bulk Add Students
+POST http://localhost:8000/api/admin/students/bulk
+Authorization: Bearer {{adminToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="students.csv"
+Content-Type: text/csv
+
+< ./students.csv
+--boundary--

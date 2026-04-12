@@ -1,0 +1,5 @@
+name,email,year,department
+Amit Kumar,amit@college.com,TE,CSE
+Priya Patel,priya@college.com,SE,IT
+Rohit Sharma,rohit@college.com,BE,ME
+Invalid Student,notanemail,XYZ,ABC
