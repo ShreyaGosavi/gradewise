@@ -5,8 +5,8 @@ POST http://localhost:8000/api/admin/auth/login
 Content-Type: application/json
 
 {
-  "email": "Smita Anit",
-  "password": "shreyagosavi05@gmail.com"
+  "email": "swati@gradewise.com",
+  "password": "swati@123"
 }
 
 ### 2. Admin Get Me

@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { errorHandler } from "./shared/middleware/error.middleware";
 import adminRoutes from "./modules/admin/routes/index";
 import teacherRoutes from "./modules/teacher/routes/index";
@@ -13,7 +14,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 app.use(express.json());
 
 app.use("/api/admin", adminRoutes);
