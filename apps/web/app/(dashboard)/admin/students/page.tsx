@@ -41,8 +41,12 @@ const years = ["FE", "SE", "TE", "BE"];
 const addStudentSchema = z.object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email"),
-    year: z.enum(["FE", "SE", "TE", "BE"], { errorMap: () => ({ message: "Select a year" }) }),
-    department: z.enum(["CSE", "IT", "ME", "CIVIL", "EXTC"], { errorMap: () => ({ message: "Select a department" }) }),
+    year: z.enum(["FE", "SE", "TE", "BE"] as const, {
+        error: "Select a year",
+    }),
+    department: z.enum(["CSE", "IT", "ME", "CIVIL", "EXTC"] as const, {
+        error: "Select a department",
+    }),
 });
 
 type AddStudentForm = z.infer<typeof addStudentSchema>;
