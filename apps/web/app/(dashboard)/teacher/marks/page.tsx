@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/shared/auth-guard";
 import { Topbar } from "@/components/shared/topbar";
-import { getTeacherMe, getMarks, addMarks, calculateInternal } from "@/lib/api/teacher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Plus, Calculator } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getTeacherMe, getMarks, addMarks, calculateInternal, getClassStudents } from "@/lib/api/teacher";
 
 const markTypes = ["INSEM1", "INSEM2", "ENDSEM", "PRACTICAL", "ORAL"];
 
@@ -70,8 +70,21 @@ export default function TeacherMarksPage() {
     useEffect(() => {
         if (!selected) return;
         setMarksLoading(true);
-        getMarks(selected.class.id, selected.subject.id)
-            .then(setMarks)
+
+        Promise.all([
+            getMarks(selected.class.id, selected.subject.id),
+            getClassStudents(selected.class.id),
+        ])
+            .then(([marksData, studentsData]) => {
+                setMarks(marksData);
+                setStudentMarks(
+                    studentsData.map((s: any) => ({
+                        studentId: s.id,
+                        name: s.name,
+                        obtained: 0,
+                    }))
+                );
+            })
             .catch(console.error)
             .finally(() => setMarksLoading(false));
     }, [selected]);
@@ -255,10 +268,10 @@ export default function TeacherMarksPage() {
                                                             </div>
                                                         </div>
                                                         <div className="space-y-2 max-h-60 overflow-y-auto">
-                                                            {allStudents.length === 0 ? (
-                                                                <p className="text-xs text-muted-foreground">No students found. Add attendance first.</p>
+                                                            {studentMarks.length === 0 ? (
+                                                                <p className="text-xs text-muted-foreground">No students in this class.</p>
                                                             ) : (
-                                                                allStudents.map((s) => (
+                                                                studentMarks.map((s) => (
                                                                     <div key={s.studentId} className="flex items-center justify-between gap-3">
                                                                         <span className="text-sm flex-1">{s.name}</span>
                                                                         <Input
@@ -268,17 +281,13 @@ export default function TeacherMarksPage() {
                                                                             max={total}
                                                                             defaultValue={0}
                                                                             onChange={(e) => {
-                                                                                setStudentMarks((prev) => {
-                                                                                    const existing = prev.find((x) => x.studentId === s.studentId);
-                                                                                    if (existing) {
-                                                                                        return prev.map((x) =>
-                                                                                            x.studentId === s.studentId
-                                                                                                ? { ...x, obtained: Number(e.target.value) }
-                                                                                                : x
-                                                                                        );
-                                                                                    }
-                                                                                    return [...prev, { ...s, obtained: Number(e.target.value) }];
-                                                                                });
+                                                                                setStudentMarks((prev) =>
+                                                                                    prev.map((x) =>
+                                                                                        x.studentId === s.studentId
+                                                                                            ? { ...x, obtained: Number(e.target.value) }
+                                                                                            : x
+                                                                                    )
+                                                                                );
                                                                             }}
                                                                         />
                                                                         <span className="text-xs text-muted-foreground">/ {total}</span>

@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: () => !!get().token,
         }),
         {
-            name: "gradewise-auth",
+            name: "gradewise-auth", // ← must match what axios reads
         }
     )
 );

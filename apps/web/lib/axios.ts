@@ -4,26 +4,27 @@ const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
 });
 
-// attach token to every request automatically
 api.interceptors.request.use((config) => {
     if (typeof window !== "undefined") {
-        const token = localStorage.getItem("token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        // Zustand persists as JSON under this key
+        const raw = localStorage.getItem("gradewise-auth");
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            const token = parsed?.state?.token;
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
     }
     return config;
 });
 
-// handle 401 globally
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             if (typeof window !== "undefined") {
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                localStorage.removeItem("role");
+                localStorage.removeItem("gradewise-auth");
                 window.location.href = "/login";
             }
         }

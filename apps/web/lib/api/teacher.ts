@@ -93,3 +93,8 @@ export const deleteNotice = async (noticeId: number) => {
     const res = await api.delete(`/teacher/notices/${noticeId}`);
     return res.data;
 };
+
+export const getClassStudents = async (classId: number) => {
+    const res = await api.get(`/admin/students`, { params: { classId, limit: 100 } });
+    return res.data.data;
+};
